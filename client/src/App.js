@@ -41,7 +41,7 @@ function App() {
   return <Container fluid className="pt-0 pb-3" >
     <span id="top"></span>
     <Router>
-      <NavbarHome connected={connected} user={user} />
+      <NavbarHome />
 
       <Switch>
         <Route exact path="/" >

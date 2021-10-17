@@ -1,40 +1,31 @@
 import { useState } from 'react';
 import { Form, Button } from 'react-bootstrap'
+import { useSelector } from 'react-redux'
 
 
 const AddNewMsg = ({ updateList, socket }) => {
+    const userName = useSelector(state => state.user.name)
     const [details, setDetails] = useState({
-        name: "",
         data: ""
     })
 
     const update = ({ target: { name, value } }) => {
-        setDetails(prev => ({ ...prev, [name]: value }))
+        setDetails(prev => ({ [name]: value }))
     }
 
     const submitHandler = (e) => {
         e.preventDefault()
 
         //add and send function/data through socket!
-        socket.emit('message', details)
+        socket.emit('message', { name: userName, data: details.data })
 
         //emty the input field
-        setDetails(prev => ({ ...prev, "data": "" }))
+        setDetails(prev => ({ "data": "" }))
 
     }
 
 
     return <Form onSubmit={submitHandler}>
-
-        <Form.Group className="mb-3">
-            <Form.Label>name: </Form.Label>
-            <Form.Control type="text"
-                value={details.name}
-                onChange={update}
-                onBlur={update}
-                name="name"
-            />
-        </Form.Group>
 
         <Form.Group className="mb-3">
             <Form.Label>Write your message: </Form.Label>
@@ -47,7 +38,7 @@ const AddNewMsg = ({ updateList, socket }) => {
             />
         </Form.Group>
 
-        <Button variant="primary" type="submit">
+        <Button variant="primary" type="submit" >
             Send
         </Button>
     </Form>

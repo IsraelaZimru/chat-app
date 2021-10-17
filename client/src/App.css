@@ -2,6 +2,10 @@ body {
   background-color: rgba(185, 241, 178, 0.377);
 }
 
+.wColor {
+  color: white !important;
+}
+
 #forum {
   border: 1px solid black;
   height: 400px;
@@ -15,5 +19,15 @@ body {
   padding-left: 15px;
 }
 
-.borders {
+#loginCard {
+  margin: 30px auto;
+  padding: 10px;
+  width: 400px;
+  background-color: #eeeeee;
+  color: black;
+}
+
+#signUpCard {
+  background-color: #eeeeee;
+  border-radius: 10%;
 }

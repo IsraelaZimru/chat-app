@@ -1,19 +1,25 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Container, Row, Col, ListGroup } from 'react-bootstrap'
-import { useParams } from 'react-router'
+import { useHistory, useParams } from 'react-router'
+import { useDispatch, useSelector } from 'react-redux';
 import AddNewMsg from './AddNewMsg'
 import Messages from './Messages'
 
 export default function ChatRoom({ tweets, socket, addTweet }) {
     let { roomId } = useParams()
+    const history = useHistory()
+    const connected = useSelector(state => state.user.isLogin)
+
+    useEffect(() => {
+        if (!connected) history.push("/")
+    }, [connected])
 
     return (
         <div className="p-3">
-            <h1 className="display-3 text-center mb-4">  {roomId} Chat Room</h1>
 
-            <Container>
+            <Container >
                 <Row>
-                    <Col md={3}>
+                    <Col md={3} className="mt-5">
                         <ListGroup style={{ textAlign: "center" }} >
                             <ListGroup.Item variant="dark"><strong>Participants:</strong></ListGroup.Item>
                             <ListGroup.Item variant="dark">lala</ListGroup.Item>
@@ -22,6 +28,7 @@ export default function ChatRoom({ tweets, socket, addTweet }) {
                         </ListGroup>
                     </Col>
                     <Col>
+                        <h1 className="display-3 text-center mb-4">  {roomId} Chat Room</h1>
                         <section className="borders">
                             <Container id="forum">
                                 <Row className="justify-content-md-center">

@@ -80,9 +80,9 @@ function SignUp({ hasPageAaccess, connected }) {
     }
 
 
-    return <Container id="bkgdImge">
+    return <Container >
         <Row className="justify-content-center">
-            <Card className="m-5 w-50 p-0" style={{ borderRadius: "10%" }}>
+            <Card className="m-5 w-50 p-3" id="signUpCard">
                 <Form noValidate validated={validated} onSubmit={handleSubmit} id="bkgdStyleForm">
                     <Alert show={show} variant="warning" onClose={() => setShow(false)}>
                         <strong> User email already exist. Please try with another email.</strong>
