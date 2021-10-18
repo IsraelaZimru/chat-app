@@ -1,18 +1,41 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Container, Row, Col, ListGroup } from 'react-bootstrap'
 import { useHistory, useParams } from 'react-router'
 import { useDispatch, useSelector } from 'react-redux';
 import AddNewMsg from './AddNewMsg'
 import Messages from './Messages'
+import { io } from 'socket.io-client'
 
-export default function ChatRoom({ tweets, socket, addTweet }) {
+const socket = io.connect('http://localhost:5000');
+
+
+export default function ChatRoom() {
     let { roomId } = useParams()
     const history = useHistory()
     const connected = useSelector(state => state.user.isLogin)
+    const [tweets, setTweets] = useState([])
+
 
     useEffect(() => {
-        if (!connected) history.push("/")
+        if (!connected) {
+            return history.push("/")
+        }
     }, [connected])
+
+
+    useEffect(() => {
+
+        socket.on('message', ([data]) => {
+            console.log(data);
+            setTweets(prev => [...prev, data])
+        })
+    }, [])
+
+
+    const addTweet = (msg) => {
+        setTweets(prev => ([...prev, msg]))
+    }
+
 
     return (
         <div className="p-3">

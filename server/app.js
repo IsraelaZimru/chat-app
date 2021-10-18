@@ -13,7 +13,7 @@ var app = express();
 
 
 //Connection to DB
-mongoose.connect('mongodb+srv://IsraelaZimru:2DFOudU8lkOZ4uC9@fullstackprojects.epp4t.mongodb.net/websocket',
+const dbConnect = mongoose.connect('mongodb+srv://IsraelaZimru:2DFOudU8lkOZ4uC9@fullstackprojects.epp4t.mongodb.net/websocket',
     { useNewUrlParser: true, useUnifiedTopology: true })
     .then((result) => console.log('connected to db'))
     .catch(err => console.log(err));
@@ -29,6 +29,11 @@ sockIO.on('connection', socket => {
     console.log(`A client connection occurred!. id= ${socket.id}`);
 
     socket.on("disconnect", () => console.log(`a user disconnect!`))
+
+    socket.on('message', data => {
+        console.log('message received on servr: ', data);
+        sockIO.emit('message', [data])
+    })
 });
 
 app.use(function (req, res, next) {

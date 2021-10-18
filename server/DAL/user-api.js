@@ -2,7 +2,6 @@ const User = require('../database/models/user')
 
 const newUser = async (name, email, password) => {
     const user = await new User({ "email": email, "password": password, "name": name })
-    console.log(user);
     user.save()
     return { name: user.name, id: user._id };
 }
