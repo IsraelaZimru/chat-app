@@ -5,8 +5,9 @@ const roomSchema = new Schema({
     name: {
         type: String,
         required: true,
+        index: true
     },
-    users: [{ type: String }],
+    users: [{ type: mongoose.Schema.ObjectId }],
     messages: []
 })
 

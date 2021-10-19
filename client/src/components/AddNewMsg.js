@@ -3,7 +3,7 @@ import { Form, Button } from 'react-bootstrap'
 import { useSelector } from 'react-redux'
 
 
-const AddNewMsg = ({ updateList, socket }) => {
+const AddNewMsg = ({ socket }) => {
     const userName = useSelector(state => state.user.name)
     const [details, setDetails] = useState({
         data: ""
@@ -16,11 +16,23 @@ const AddNewMsg = ({ updateList, socket }) => {
     const submitHandler = (e) => {
         e.preventDefault()
 
-        //add and send function/data through socket!
-        socket.emit('message', { name: userName, data: details.data })
+        //activate and send function/data through socket to the server!
+        // socket.emit('message', {
+        socket.emit('chatMessage', {
+            name: userName,
+            data: details.data,
+            time: new Date(Date.now()).getHours() +
+                ":" +
+                new Date(Date.now()).getMinutes()
+        })
 
-        //emty the input field
+        //empty the input field
         setDetails(prev => ({ "data": "" }))
+
+
+        //scroll to the end
+        // bottomRef.current.scrollTop = bottomRef.current.scrollHeight;
+        // bottomRef.current.scrollTop = bottomRef.current.scrollHeight - bottomRef.current.clientHeight;
 
     }
 
@@ -37,10 +49,11 @@ const AddNewMsg = ({ updateList, socket }) => {
                 name="data"
             />
         </Form.Group>
-
-        <Button variant="primary" type="submit" >
-            Send
-        </Button>
+        <div className="text-center">
+            <Button variant="primary" type="submit" >
+                Send
+            </Button>
+        </div>
     </Form>
 }
 

@@ -1,39 +1,73 @@
-import React, { useEffect, useState } from 'react'
-import { Container, Row, Col, ListGroup } from 'react-bootstrap'
+import React, { useEffect, useRef, useState } from 'react'
+import { Container, Row, Col, ListGroup, Button } from 'react-bootstrap'
 import { useHistory, useParams } from 'react-router'
 import { useDispatch, useSelector } from 'react-redux';
 import AddNewMsg from './AddNewMsg'
 import Messages from './Messages'
 import { io } from 'socket.io-client'
+import { getRoomData } from '../DAL/api';
 
-const socket = io.connect('http://localhost:5000');
+let socket;
+const CONNECTION_PORT = 'http://localhost:5000';
 
 
 export default function ChatRoom() {
     let { roomId } = useParams()
     const history = useHistory()
-    const connected = useSelector(state => state.user.isLogin)
-    const [tweets, setTweets] = useState([])
+    const user = useSelector(state => state.user)
+    const [chat, setChat] = useState({
+        name: "",
+        msg: [],
+        users: []
+    })
+
+    useEffect(() => {
+        socket = io.connect(CONNECTION_PORT)
+    }, [CONNECTION_PORT])
+
+    useEffect(() => {
+        //Join chatroom
+        socket.emit('joinRoom', { sender: user.name, senderId: user.id, roomId })
+    }, [])
 
 
     useEffect(() => {
-        if (!connected) {
+        if (!user.isLogin) {
             return history.push("/")
         }
-    }, [connected])
+    }, [user.isLogin])
 
 
     useEffect(() => {
+        const roomInfo = async (id) => {
+            try {
+                const response = await getRoomData(id)
+                setChat(prev => response)
+            } catch (err) {
+                console.log(err);
+                alert("error", err)
+            }
+        }
 
+        roomInfo(roomId)
+
+        //Listning to new msg and reciving it:
         socket.on('message', ([data]) => {
             console.log(data);
-            setTweets(prev => [...prev, data])
+            setChat(prev => ({ ...prev, "msg": [...prev.msg, data] }))
+        })
+
+        socket.on('roomUsers', ({ users }) => {
+            console.log("users", users);
+            setChat(prev => ({ ...prev, "users": users }))
         })
     }, [])
 
 
-    const addTweet = (msg) => {
-        setTweets(prev => ([...prev, msg]))
+
+    const leaveRoom = () => {
+        history.push('/')
+        history.go(0)
     }
 
 
@@ -45,24 +79,32 @@ export default function ChatRoom() {
                     <Col md={3} className="mt-5">
                         <ListGroup style={{ textAlign: "center" }} >
                             <ListGroup.Item variant="dark"><strong>Participants:</strong></ListGroup.Item>
-                            <ListGroup.Item variant="dark">lala</ListGroup.Item>
-                            <ListGroup.Item variant="dark">rara</ListGroup.Item>
-                            <ListGroup.Item variant="dark">mimi</ListGroup.Item>
+
+                            {!!chat.users.length && chat.users.map((user, i) => <ListGroup.Item
+                                variant="dark" key={i}>{user.name}</ListGroup.Item>)
+                            }
+
                         </ListGroup>
+
+                        <div className="m-3 text-center">
+                            <Button variant="warning" size="lg" onClick={leaveRoom}>
+                                Leave Chat
+                            </Button>
+                        </div>
                     </Col>
                     <Col>
-                        <h1 className="display-3 text-center mb-4">  {roomId} Chat Room</h1>
+                        <h1 className="display-3 text-center mb-4">  {chat.name} Chat Room</h1>
                         <section className="borders">
-                            <Container id="forum">
+                            <Container id="forum" S>
                                 <Row className="justify-content-md-center">
                                     <Col md="auto">
                                         <h1> Group Chat</h1>
                                     </Col>
                                 </Row>
 
-                                <Row className="p-3">
+                                <Row className="p-3" id="fixHight">
                                     <Col md={5}>
-                                        <Messages msgs={tweets} socket={socket} />
+                                        <Messages msgs={chat.msg} socket={socket} />
                                     </Col>
                                 </Row>
                             </Container>
@@ -72,7 +114,7 @@ export default function ChatRoom() {
                             <Container id="add-msg">
                                 <Row className="p-3">
                                     <Col>
-                                        <AddNewMsg updateList={addTweet} socket={socket} />
+                                        <AddNewMsg socket={socket} />
                                     </Col>
                                 </Row>
                             </Container>

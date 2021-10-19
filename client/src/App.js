@@ -8,10 +8,18 @@ import SignUp from './components/SignUp';
 import NavbarHome from './components/NavbarHome';
 import HomePage from './components/HomePage';
 import ChatRoom from './components/ChatRoom';
-
+import { useDispatch } from 'react-redux'
+import { userActions } from './store/user-slice';
 
 function App() {
+  const dispatch = useDispatch()
 
+  useEffect(() => {
+    const checkConnected = JSON.parse(localStorage.getItem("user"))
+    if (checkConnected) {
+      dispatch(userActions.userlogin(checkConnected))
+    }
+  }, [])
 
 
   return <Container fluid className="pt-0 pb-3" >

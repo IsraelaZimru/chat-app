@@ -29,6 +29,7 @@ router.post('/login', async function (req, res) {
 
     const result = await api.login(email, password);
     if (result) {
+      res.cookie('user', result);
       res.status(200).json(result);
     }
     else res.json({ error: 'email or password incorrect' });
@@ -38,6 +39,7 @@ router.post('/login', async function (req, res) {
     })
   }
 });
+
 
 
 module.exports = router;

@@ -47,6 +47,7 @@ function Login() {
             setError(true)
         } else {
             history.push("/")
+            localStorage.setItem("user", JSON.stringify(chekingDetails))
             dispatch(userActions.userlogin(chekingDetails))
 
         }

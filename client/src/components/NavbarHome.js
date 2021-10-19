@@ -13,19 +13,20 @@ const NavbarHome = () => {
     const dispatch = useDispatch()
 
     const logout = () => {
+        localStorage.clear();
         dispatch(userActions.userLogout())
     }
 
     return <Navbar bg="dark" variant="dark">
         <Navbar.Brand onClick={() => window.scrollTo(0, 0)}>
-            <Link to="/">
-                <img src={logo3} style={{ height: '50px', width: '100px' }} alt="logo"></img>
-            </Link>
+            {/* <Link to="/"> */}
+            {/* <img src={logo3} style={{ height: '50px', width: '100px' }} alt="logo"></img> */}
+            {/* </Link> */}
         </Navbar.Brand>
         <Nav className="mr-auto">
-            <Nav.Link>
+            {/* <Nav.Link>
                 <Link to="/" style={{ color: "white" }}> Home Page </Link>
-            </Nav.Link>
+            </Nav.Link> */}
             <Nav.Link style={{ display: connected ? 'none' : 'block' }}>
                 <Link to="/Sign_Up" style={{ color: "white" }}>Sign Up</Link>
             </Nav.Link>

@@ -1,13 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Col, Row, Card, Alert, Tooltip, OverlayTrigger } from 'react-bootstrap';
 import { useHistory } from 'react-router';
 import { useSelector } from 'react-redux'
+import { getRooms } from '../DAL/api';
 
 
 export default function HomePage() {
     const history = useHistory()
     const userLogin = useSelector(state => state.user.isLogin)
     const [error, setError] = useState(false);
+    const [rooms, setRooms] = useState([]);
+
+
+    useEffect(() => {
+        const fetchRooms = async () => {
+            const response = await getRooms()
+            // console.log(response);
+            setRooms(prev => response)
+        }
+        fetchRooms()
+
+    }, [])
 
 
     const isConnected = (room) => {
@@ -29,7 +42,7 @@ export default function HomePage() {
             </div>
         </Row>
         <Row className="justify-content-center mb-3">
-            {["News", "Sports", "Cooking", "Games", "Vehicles", "Animals"].map((room, i) => <OverlayTrigger
+            {!!rooms.length && rooms.map((room, i) => <OverlayTrigger
 
                 key={i}
                 placement="top"
@@ -47,9 +60,9 @@ export default function HomePage() {
                     as={Col}
                     md={3}
                     className="m-3"
-                    onClick={() => isConnected(room)}>
+                    onClick={() => isConnected(room.id)}>
                     <Card.Body>
-                        <Card.Title className="text-center">{room} </Card.Title>
+                        <Card.Title className="text-center">{room.name} </Card.Title>
                         <hr></hr>
                     </Card.Body>
                 </Card>
