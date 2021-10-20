@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Form, Button } from 'react-bootstrap'
 import { useSelector } from 'react-redux'
+const moment = require('moment')
 
 
-const AddNewMsg = ({ socket }) => {
+const AddNewMsg = ({ socket, roomId }) => {
     const userName = useSelector(state => state.user.name)
     const [details, setDetails] = useState({
         data: ""
@@ -19,11 +20,11 @@ const AddNewMsg = ({ socket }) => {
         //activate and send function/data through socket to the server!
         // socket.emit('message', {
         socket.emit('chatMessage', {
+            room: roomId,
             name: userName,
             data: details.data,
-            time: new Date(Date.now()).getHours() +
-                ":" +
-                new Date(Date.now()).getMinutes()
+            time: moment().format('h:mm a')
+
         })
 
         //empty the input field

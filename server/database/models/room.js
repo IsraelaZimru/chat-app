@@ -7,9 +7,9 @@ const roomSchema = new Schema({
         required: true,
         index: true
     },
-    users: [{ type: mongoose.Schema.ObjectId }],
-    messages: []
+    users: [{}],
+    msg: []
 })
 
-module.exports = mongoose.model('Room', roomSchema);
+module.exports = mongoose.models.Room || mongoose.model('Room', roomSchema);
 

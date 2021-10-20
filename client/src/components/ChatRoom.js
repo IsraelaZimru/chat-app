@@ -4,11 +4,13 @@ import { useHistory, useParams } from 'react-router'
 import { useDispatch, useSelector } from 'react-redux';
 import AddNewMsg from './AddNewMsg'
 import Messages from './Messages'
-import { io } from 'socket.io-client'
+// import { io } from 'socket.io-client'
 import { getRoomData } from '../DAL/api';
+import { socket } from '../socket/socket'
 
-let socket;
-const CONNECTION_PORT = 'http://localhost:5000';
+
+// let socket;
+// const CONNECTION_PORT = 'http://localhost:5000';
 
 
 export default function ChatRoom() {
@@ -21,13 +23,16 @@ export default function ChatRoom() {
         users: []
     })
 
-    useEffect(() => {
-        socket = io.connect(CONNECTION_PORT)
-    }, [CONNECTION_PORT])
+    // useEffect(() => {
+    //     socket = io.connect(CONNECTION_PORT)
+    // }, [CONNECTION_PORT])
 
     useEffect(() => {
         //Join chatroom
         socket.emit('joinRoom', { sender: user.name, senderId: user.id, roomId })
+        return () => {
+            socket.off('joinRoom', { sender: user.name, senderId: user.id, roomId });
+        };
     }, [])
 
 
@@ -53,13 +58,13 @@ export default function ChatRoom() {
 
         //Listning to new msg and reciving it:
         socket.on('message', ([data]) => {
-            console.log(data);
+            // console.log(data);
             setChat(prev => ({ ...prev, "msg": [...prev.msg, data] }))
         })
 
-        socket.on('roomUsers', ({ users }) => {
+        socket.on('roomUsers', async ({ users }) => {
+            await setChat(prev => ({ ...prev, "users": users }))
             console.log("users", users);
-            setChat(prev => ({ ...prev, "users": users }))
         })
     }, [])
 
@@ -114,7 +119,7 @@ export default function ChatRoom() {
                             <Container id="add-msg">
                                 <Row className="p-3">
                                     <Col>
-                                        <AddNewMsg socket={socket} />
+                                        <AddNewMsg socket={socket} roomId={roomId} />
                                     </Col>
                                 </Row>
                             </Container>

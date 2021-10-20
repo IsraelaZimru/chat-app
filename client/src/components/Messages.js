@@ -1,7 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 const Messages = ({ msgs }) => {
+    const msgEndRef = useRef(null)
 
+    useEffect(() => {
+        msgEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    }
+        , [msgs])
 
     return <div>
         {!!msgs.length && msgs.map((item, i) => <p key={i} id="msg">
@@ -11,6 +16,7 @@ const Messages = ({ msgs }) => {
             {item.data}
             <br></br>
         </p>)}
+        <span ref={msgEndRef}></span>
     </div>
 }
 

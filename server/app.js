@@ -4,7 +4,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const cors = require('cors')
 const mongoose = require('mongoose');
-const { userJoin, getCurrentUser, userEnterChatMsg, getRoomUsers, userLeave, userLeavingChatMsg } = require('./DAL/socket-utils');
+const { userJoin, getCurrentUserAndSaveMsgDb, userEnterChatMsg, getRoomUsers, userLeave, userLeavingChatMsg } = require('./DAL/socket-utils');
 
 
 var indexRouter = require('./routes/index');
@@ -32,15 +32,16 @@ sockIO.on('connection', socket => {
 
 
     //client joinRoom:
-    socket.on("joinRoom", ({ sender, senderId, roomId }) => {
-        const user = userJoin(socket.id, sender, senderId, roomId)
+    socket.on("joinRoom", async ({ sender, senderId, roomId }) => {
+        const user = await userJoin(socket.id, sender, senderId, roomId);
+        const participants = await getRoomUsers(user.room);
 
         socket.join(user.room)
-        console.log(`${user.name} join a room- ${user.room}`);
+        console.log(`${user.name} join a room- ${user.room}-`, user);
 
         // Send users and room info
-        socket.to(user.room).emit('roomUsers', {
-            users: getRoomUsers(user.room)
+        sockIO.to(user.room).emit('roomUsers', {
+            users: participants
         });
 
 
@@ -57,8 +58,8 @@ sockIO.on('connection', socket => {
     // })
 
     // Listen for chatMessage
-    socket.on('chatMessage', msg => {
-        const user = getCurrentUser(socket.id);
+    socket.on('chatMessage', async msg => {
+        const user = await getCurrentUserAndSaveMsgDb(socket.id, msg.room, msg);
 
         console.log('message received on room', user.room);
         sockIO.to(user.room).emit('message', [msg]);
@@ -67,30 +68,67 @@ sockIO.on('connection', socket => {
 
     //run when client disconnects    
     // socket.on("disconnect", () => console.log(`a user disconnect!`));  // Runs when client disconnects
-    socket.on('disconnect', () => {
-        const user = userLeave(socket.id);
+    // socket.on('disconnect', async () => {
+    //     const user = userLeave(socket.id);
+    //     const participants = await getRoomUsers(user.room);
 
-        if (user) {
-            sockIO.to(user.room).emit(
-                'message',
-                [userLeavingChatMsg(user.name)]
-            );
+    //     console.log(user.name, "user disconnect");
+    //     if (user) {
+    //         sockIO.to(user.room).emit(
+    //             'message',
+    //             [userLeavingChatMsg(user.name)]
+    //         );
 
-            // Send users and room info
-            sockIO.to(user.room).emit('roomUsers', {
-                room: user.room,
-                users: getRoomUsers(user.room)
-            });
+    //         // Send users and room info
+    //         sockIO.to(user.room).emit('roomUsers', {
+    //             users: participants
+    //         });
+    //     }
+    // });
+
+    // socket.on('disconnecting', function () {
+    //     console.log("disconnecting.. ", socket.id)
+    //     notifyFriendOfDisconnect(socket);
+
+
+    //     function notifyFriendOfDisconnect(socket) {
+    //         const rooms = Object.keys(socket.rooms);
+    //         rooms.forEach(function (room) {
+    //             socket.to(room).emit('roomUsers', {
+    //                 users: participants
+    //             });
+    //         });
+    //     }
+    // });
+
+    socket.on("disconnecting", async () => {
+
+        console.log("disconnecting user.. ", socket.id)
+        for (const room of socket.rooms) {
+            if (room !== socket.id) {
+                const user = await userLeave(room, socket.id);
+                const participants = await getRoomUsers(room);
+                socket.to(room).emit('roomUsers', {
+                    users: participants
+                });
+
+                sockIO.to(room).emit('message',
+                    [userLeavingChatMsg(user.name)]
+                );
+            }
         }
     });
+
+
+
 });
 
 
 
-app.use(function (req, res, next) {
-    res.io = sockIO;
-    next();
-});
+// app.use(function (req, res, next) {
+//     res.io = sockIO;
+//     next();
+// });
 
 
 app.use(cors({

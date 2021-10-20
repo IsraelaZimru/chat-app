@@ -21,7 +21,6 @@ function SignUp({ hasPageAaccess, connected }) {
     })
 
     const handleSubmit = async (event) => {
-        console.log("enetr sumbit");
         const checkErrors = [];
         for (const key in details) {
             if (Object.hasOwnProperty.call(details, key)) {
@@ -57,6 +56,7 @@ function SignUp({ hasPageAaccess, connected }) {
             alert(`not working!!`)
         } else {
             alert(`You have successfully registered. You can login to the site!!!😍🥰`)
+            history.push('/')
         }
     };
 
