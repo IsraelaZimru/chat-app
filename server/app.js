@@ -4,7 +4,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const cors = require('cors')
 const mongoose = require('mongoose');
-const { userJoin, getCurrentUserAndSaveMsgDb, userEnterChatMsg, getRoomUsers, userLeave, userLeavingChatMsg } = require('./DAL/socket-utils');
+const { userJoin, getCurrentUserAndSaveMsgDb, userEnterChatMsg, getRoomUsers, userLeave, userLeavingChatMsg, updateSeenMsgs } = require('./DAL/socket-utils');
 
 
 var indexRouter = require('./routes/index');
@@ -63,7 +63,16 @@ sockIO.on('connection', socket => {
 
         console.log('message received on room', user.room);
         sockIO.to(user.room).emit('message', [msg]);
+
     });
+
+    // Listen when client tab on focus - to update if message seen:
+    socket.on("msgs-seen", async (room) => {
+        const msgs = await updateSeenMsgs(room)
+
+        console.log("msgs from seen/unseen-", msgs);
+        socket.to(room).emit("get-seen-Msgs", msgs)
+    })
 
 
     //run when client disconnects    

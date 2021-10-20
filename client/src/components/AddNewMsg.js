@@ -23,8 +23,8 @@ const AddNewMsg = ({ socket, roomId }) => {
             room: roomId,
             name: userName,
             data: details.data,
-            time: moment().format('h:mm a')
-
+            time: moment().format('h:mm a'),
+            seen: false
         })
 
         //empty the input field

@@ -76,6 +76,35 @@ export default function ChatRoom() {
     }
 
 
+    const onFocus = () => {
+        socket.emit("msgs-seen", roomId)
+        console.log('Tab is in focus');
+        socket.on("get-seen-Msgs", async (msgs) => {
+            await setChat(prev => ({ ...prev, "msg": msgs }))
+
+            console.log("temp", msgs);
+        })
+    };
+
+    // User has switched away from the tab (AKA tab is hidden)
+    const onBlur = () => {
+        console.log('Tab is blurred');
+    };
+
+    useEffect(() => {
+        window.addEventListener('focus', onFocus);
+        window.addEventListener('blur', onBlur);
+
+
+        // Specify how to clean up after this effect:
+        return () => {
+            window.removeEventListener('focus', onFocus);
+            window.removeEventListener('blur', onBlur);
+        }
+    }, []);
+
+
+
     return (
         <div className="p-3">
 
@@ -109,7 +138,7 @@ export default function ChatRoom() {
 
                                 <Row className="p-3" id="fixHight">
                                     <Col md={5}>
-                                        <Messages msgs={chat.msg} socket={socket} />
+                                        <Messages msgs={chat.msg} socket={socket} roomId={roomId} />
                                     </Col>
                                 </Row>
                             </Container>

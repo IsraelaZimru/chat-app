@@ -25,9 +25,9 @@ async function getCurrentUserAndSaveMsgDb(socketId, room, msg) {
         const chatRoom = await Room.findOne({ _id: room })
         const user = chatRoom.users.find(user => user.socketId === socketId)
         // console.log("getCurrentUser", user);
-        chatRoom.msg.push({ name: msg.name, data: msg.data, time: msg.time })
+        chatRoom.msg.push({ name: msg.name, data: msg.data, time: msg.time, seen: msg.seen })
         await chatRoom.save()
-        console.log("chatRoom", chatRoom);
+        // console.log("chatRoom", chatRoom);
         return users.find(user => user.socketId === socketId)
     } catch (err) {
         console.log(err);
@@ -40,10 +40,9 @@ function userEnterChatMsg(userName) {
     return {
         name: userName,
         data: `${userName} has joined the chat`,
-        // time: new Date(Date.now()).getHours() +
-        //     ":" +
-        //     new Date(Date.now()).getMinutes()
-        time: moment().format('h:mm a')
+        time: moment().format('h:mm a'),
+        seen: false
+
     }
 }
 
@@ -52,10 +51,8 @@ function userLeavingChatMsg(userName = "") {
     return {
         name: userName,
         data: `${userName ? userName + " has" : "I"} left the chat`,
-        // time: new Date(Date.now()).getHours() +
-        //     ":" +
-        //     new Date(Date.now()).getMinutes()
-        time: moment().format('h:mm a')
+        time: moment().format('h:mm a'),
+        seen: false
     }
 }
 
@@ -65,7 +62,7 @@ async function getRoomUsers(room) {
         const users = await chatRoom.users.map(user => {
             return { name: user.name }
         })
-        console.log("participants:", users);
+        // console.log("participants:", users);
         return users;
         // return users.filter(user => user.room === room);
     } catch (err) {
@@ -87,7 +84,7 @@ async function userLeave(roomId, id) {
                 return room;
             }
 
-            console.log("update room-", chatRoom, "user id", id);
+            // console.log("update room-", chatRoom, "user id", id);
             // const newUsersLst = room.users.filter(u => u.socketId !== id);
             // room.users = newUsersLst;
             // return room;
@@ -103,11 +100,32 @@ async function userLeave(roomId, id) {
     } catch (err) { console.log(err) }
 }
 
+
+async function updateSeenMsgs(room) {
+    try {
+        const chatRoom = await Room.findOne({ _id: room });
+        console.log("before chatRoom", chatRoom);
+
+        const msgs = chatRoom.msg.map(m => ({ ...m, "seen": true }));
+        chatRoom.msg = msgs;
+
+        await chatRoom.save()
+        console.log("after chatRoom", chatRoom);
+
+        return chatRoom.msg;
+
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+
 module.exports = {
     userJoin,
     getCurrentUserAndSaveMsgDb,
     userEnterChatMsg,
     userLeavingChatMsg,
     getRoomUsers,
-    userLeave
+    userLeave,
+    updateSeenMsgs
 }
