@@ -20,9 +20,17 @@ export default function ChatRoom() {
 
     useEffect(() => {
         //Join chatroom
-        socket.emit('joinRoom', { sender: user.name, senderId: user.id, roomId })
+        if (localStorage.getItem("room")) {
+            alert(`${user.name} - You are already logged in from another browser.`)
+            history.push('/')
+            return;
+        } else {
+            socket.emit('joinRoom', { sender: user.name, senderId: user.id, roomId })
+            localStorage.setItem("room", JSON.stringify(roomId))
+        }
         return () => {
             socket.off('joinRoom', { sender: user.name, senderId: user.id, roomId });
+            localStorage.removeItem('room');
         };
     }, [])
 
