@@ -1,7 +1,7 @@
 import { Button, Card, Form, InputGroup, Alert, Container, Row } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router";
-import { addNewUser } from "../DAL/api";
+import { addNewUser } from "../../DAL/api";
 
 
 function SignUp({ hasPageAaccess, connected }) {

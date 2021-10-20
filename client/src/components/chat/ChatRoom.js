@@ -1,16 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Container, Row, Col, ListGroup, Button } from 'react-bootstrap'
 import { useHistory, useParams } from 'react-router'
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import AddNewMsg from './AddNewMsg'
 import Messages from './Messages'
-// import { io } from 'socket.io-client'
-import { getRoomData } from '../DAL/api';
-import { socket } from '../socket/socket'
-
-
-// let socket;
-// const CONNECTION_PORT = 'http://localhost:5000';
+import { getRoomData } from '../../DAL/api';
+import { socket } from '../../socket/socket'
 
 
 export default function ChatRoom() {
@@ -22,10 +17,6 @@ export default function ChatRoom() {
         msg: [],
         users: []
     })
-
-    // useEffect(() => {
-    //     socket = io.connect(CONNECTION_PORT)
-    // }, [CONNECTION_PORT])
 
     useEffect(() => {
         //Join chatroom
@@ -58,7 +49,6 @@ export default function ChatRoom() {
 
         //Listning to new msg and reciving it:
         socket.on('message', ([data]) => {
-            // console.log(data);
             setChat(prev => ({ ...prev, "msg": [...prev.msg, data] }))
         })
 

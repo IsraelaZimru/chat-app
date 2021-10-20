@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css'
 import { Container } from 'react-bootstrap'
 import './App.css';
-import Login from './components/Login';
-import SignUp from './components/SignUp';
+import Login from './components/user_forms/Login';
+import SignUp from './components/user_forms/SignUp';
 import NavbarHome from './components/NavbarHome';
 import HomePage from './components/HomePage';
-import ChatRoom from './components/ChatRoom';
+import ChatRoom from './components/chat/ChatRoom';
 import { useDispatch } from 'react-redux'
 import { userActions } from './store/user-slice';
 

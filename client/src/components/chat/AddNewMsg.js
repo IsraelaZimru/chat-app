@@ -17,8 +17,9 @@ const AddNewMsg = ({ socket, roomId }) => {
     const submitHandler = (e) => {
         e.preventDefault()
 
+        if (details.data.length < 1) return;
+
         //activate and send function/data through socket to the server!
-        // socket.emit('message', {
         socket.emit('chatMessage', {
             room: roomId,
             name: userName,
@@ -29,11 +30,6 @@ const AddNewMsg = ({ socket, roomId }) => {
 
         //empty the input field
         setDetails(prev => ({ "data": "" }))
-
-
-        //scroll to the end
-        // bottomRef.current.scrollTop = bottomRef.current.scrollHeight;
-        // bottomRef.current.scrollTop = bottomRef.current.scrollHeight - bottomRef.current.clientHeight;
 
     }
 

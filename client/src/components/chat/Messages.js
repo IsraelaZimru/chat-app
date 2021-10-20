@@ -1,43 +1,17 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheckDouble } from "@fortawesome/free-solid-svg-icons";
 
 
-
-
-const Messages = ({ msgs, socket, roomId }) => {
+const Messages = ({ msgs }) => {
     const msgEndRef = useRef(null)
     const userName = useSelector(state => state.user.name);
-    // const [userSeeMsg, setUserSeeMsg] = useState(false)
 
     useEffect(() => {
         msgEndRef.current?.scrollIntoView({ behavior: "smooth" })
     }
         , [msgs])
-
-
-    // const onFocus = () => {
-    //     socket.emit("msgs-seen", roomId)
-    //     console.log('Tab is in focus');
-    // };
-
-    // // User has switched away from the tab (AKA tab is hidden)
-    // const onBlur = () => {
-    //     console.log('Tab is blurred');
-    // };
-
-    // useEffect(() => {
-    //     window.addEventListener('focus', onFocus);
-    //     window.addEventListener('blur', onBlur);
-
-
-    //     // Specify how to clean up after this effect:
-    //     return () => {
-    //         window.removeEventListener('focus', onFocus);
-    //         window.removeEventListener('blur', onBlur);
-    //     }
-    // }, []);
 
 
     return <div id="msgs-box">
@@ -51,7 +25,6 @@ const Messages = ({ msgs, socket, roomId }) => {
             {userName === item.name && <FontAwesomeIcon className={item.seen ? "text-primary" : ""} icon={faCheckDouble} />}
             <div className="msgBody">
                 {item.data}
-                {/* {item.seen ? "   true" : "   X"} */}
             </div>
         </div>)}
         <span ref={msgEndRef}></span>

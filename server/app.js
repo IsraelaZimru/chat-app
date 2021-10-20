@@ -51,17 +51,10 @@ sockIO.on('connection', socket => {
 
     })
 
-    // //Listen for chatMsg
-    // socket.on('message', data => {
-    //     console.log('message received on servr: ', data);
-    //     sockIO.emit('message', [data])
-    // })
-
     // Listen for chatMessage
     socket.on('chatMessage', async msg => {
         const user = await getCurrentUserAndSaveMsgDb(socket.id, msg.room, msg);
 
-        console.log('message received on room', user.room);
         sockIO.to(user.room).emit('message', [msg]);
 
     });
@@ -70,45 +63,9 @@ sockIO.on('connection', socket => {
     socket.on("msgs-seen", async (room) => {
         const msgs = await updateSeenMsgs(room)
 
-        console.log("msgs from seen/unseen-", msgs);
-        socket.to(room).emit("get-seen-Msgs", msgs)
+        sockIO.to(room).emit("get-seen-Msgs", msgs)
     })
 
-
-    //run when client disconnects    
-    // socket.on("disconnect", () => console.log(`a user disconnect!`));  // Runs when client disconnects
-    // socket.on('disconnect', async () => {
-    //     const user = userLeave(socket.id);
-    //     const participants = await getRoomUsers(user.room);
-
-    //     console.log(user.name, "user disconnect");
-    //     if (user) {
-    //         sockIO.to(user.room).emit(
-    //             'message',
-    //             [userLeavingChatMsg(user.name)]
-    //         );
-
-    //         // Send users and room info
-    //         sockIO.to(user.room).emit('roomUsers', {
-    //             users: participants
-    //         });
-    //     }
-    // });
-
-    // socket.on('disconnecting', function () {
-    //     console.log("disconnecting.. ", socket.id)
-    //     notifyFriendOfDisconnect(socket);
-
-
-    //     function notifyFriendOfDisconnect(socket) {
-    //         const rooms = Object.keys(socket.rooms);
-    //         rooms.forEach(function (room) {
-    //             socket.to(room).emit('roomUsers', {
-    //                 users: participants
-    //             });
-    //         });
-    //     }
-    // });
 
     socket.on("disconnecting", async () => {
 
@@ -128,16 +85,7 @@ sockIO.on('connection', socket => {
         }
     });
 
-
-
 });
-
-
-
-// app.use(function (req, res, next) {
-//     res.io = sockIO;
-//     next();
-// });
 
 
 app.use(cors({

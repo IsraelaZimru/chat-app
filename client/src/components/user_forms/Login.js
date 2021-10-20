@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Button, Card, Form, Row, Container, InputGroup, Alert, Spinner } from "react-bootstrap";
-import { checkLoginAccess } from "../DAL/api";
+import { checkLoginAccess } from "../../DAL/api";
 import { useDispatch } from 'react-redux'
-import { userActions } from "../store/user-slice";
+import { userActions } from "../../store/user-slice";
 import { useHistory } from "react-router";
 
 
