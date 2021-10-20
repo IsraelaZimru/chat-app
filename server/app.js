@@ -4,7 +4,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const cors = require('cors')
 const mongoose = require('mongoose');
-const { userJoin, getCurrentUserAndSaveMsgDb, userEnterChatMsg, getRoomUsers, userLeave, userLeavingChatMsg, updateSeenMsgs } = require('./DAL/socket-utils');
+const { userJoin, getCurrentUserAndSaveMsgDb, saveMsg, userEnterChatMsg, getRoomUsers, userLeave, userLeavingChatMsg, updateSeenMsgs } = require('./DAL/socket-utils');
 
 
 var indexRouter = require('./routes/index');
@@ -44,9 +44,12 @@ sockIO.on('connection', socket => {
             users: participants
         });
 
+        const welcomeMsg = await userEnterChatMsg(user.name)
+        await saveMsg(user.room, welcomeMsg)
+
 
         //Broadcast message when a user connects:
-        socket.broadcast.to(user.room).emit('message', [userEnterChatMsg(user.name)])
+        socket.broadcast.to(user.room).emit('message', [welcomeMsg])
 
 
     })
@@ -78,9 +81,13 @@ sockIO.on('connection', socket => {
                     users: participants
                 });
 
-                sockIO.to(room).emit('message',
-                    [userLeavingChatMsg(user.name)]
-                );
+                const leavingMsg = await userLeavingChatMsg(user.name)
+                await saveMsg(room, leavingMsg)
+
+
+                //Broadcast message when a user connects:
+                sockIO.to(room).emit('message', [leavingMsg])
+
             }
         }
     });

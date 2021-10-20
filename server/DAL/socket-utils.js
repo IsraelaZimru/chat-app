@@ -110,6 +110,14 @@ async function updateSeenMsgs(room) {
     }
 }
 
+async function saveMsg(room, msg) {
+    try {
+        const chatRoom = await Room.findOne({ _id: room })
+        chatRoom.msg.push({ name: msg.name, data: msg.data, time: msg.time, seen: msg.seen })
+        await chatRoom.save()
+
+    } catch (err) { console.log(err) }
+}
 
 module.exports = {
     userJoin,
@@ -118,5 +126,6 @@ module.exports = {
     userLeavingChatMsg,
     getRoomUsers,
     userLeave,
-    updateSeenMsgs
+    updateSeenMsgs,
+    saveMsg
 }
